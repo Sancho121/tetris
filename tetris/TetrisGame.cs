@@ -17,9 +17,8 @@ namespace tetris
         private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
         private int startPositionX = 4;
-        private int startPositionY = 0;
+        private int startPositionY = 0;        
         
-
         private int[,] shape = new int[3, 3]
         {
             {0, 0, 0},
@@ -73,7 +72,7 @@ namespace tetris
         }
 
         public void Update()
-        {
+        {            
             ClearArea();
             startPositionY++;
             if (startPositionY == gameFieldHeightInCells - 2)
@@ -103,6 +102,10 @@ namespace tetris
                     ClearArea();
                     startPositionY++;
                     break;
+                case Keys.Space:
+                    ClearArea();
+                    startPositionY = gameFieldHeightInCells - 2;
+                    break;
             }
         }
 
@@ -111,10 +114,13 @@ namespace tetris
             for (int y = startPositionY; y < startPositionY + 3; y++)
             {
                 for (int x = startPositionX; x < startPositionX + 3; x++)
-                {
+                {                   
                     if (x >= 0 && y >= 0 && x < gameFieldWidthInCells && y < gameFieldHeightInCells)
                     {
-                        map[y, x] = 0;
+                        if(shape[y - startPositionY, x - startPositionX] == 1)
+                        {
+                            map[y, x] = 0;
+                        }
                     }
                 }
             }
