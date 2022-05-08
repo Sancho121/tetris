@@ -16,12 +16,12 @@ namespace tetris
 
         public Form1()
         {
-            InitializeComponent();
-            tetris.Restart();
+            InitializeComponent();            
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            tetris.DrawShape();
             tetris.Draw(e.Graphics);
         }
 

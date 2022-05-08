@@ -33,12 +33,7 @@ namespace tetris
             this.cellSize = cellSize;
         }
 
-        public void Restart()
-        {
-
-        }
-
-        public void Draw(Graphics graphics)
+        public void DrawShape()
         {
             for (int i = 0; i < shape.GetLength(0); i++)
             {
@@ -48,7 +43,10 @@ namespace tetris
                         map[startPositionY + i, startPositionX + j] = 1;
                 }
             }
+        }
 
+        public void Draw(Graphics graphics)
+        {           
             for (int i = 0; i < gameFieldHeightInCells; i++)
             {
                 for (int j = 0; j < gameFieldWidthInCells; j++)
@@ -73,14 +71,17 @@ namespace tetris
 
         public void Update()
         {            
-            ClearArea();
-            startPositionY++;
-            if (startPositionY == gameFieldHeightInCells - 2)
+            ClearArea();         
+            if (CheckBottomBorderMap())
             {
-                map[gameFieldHeightInCells - 1, startPositionX + 1] = 1;
+                DrawShape();               
                 startPositionX = 4;
                 startPositionY = 0;
             }
+            else
+            {
+                startPositionY++;
+            }           
         }
 
         public void Move(Keys direction)
@@ -102,10 +103,10 @@ namespace tetris
                     ClearArea();
                     startPositionY++;
                     break;
-                case Keys.Space:
-                    ClearArea();
-                    startPositionY = gameFieldHeightInCells - 2;
-                    break;
+                //case Keys.Space:
+                //    ClearArea();
+                //    startPositionY = gameFieldHeightInCells - 2;
+                //    break;
             }
         }
 
@@ -125,6 +126,20 @@ namespace tetris
                 }
             }
         }
+
+        private bool CheckBottomBorderMap()
+        {
+            for(int y = startPositionY + 2; y >= startPositionY; y--)
+            {
+                for(int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1 && gameFieldHeightInCells == y + 1)                   
+                        return true;
+                }
+            }
+            return false;
+        }
+
 
         private bool CheckLeftBorder()
         {
