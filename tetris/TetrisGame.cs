@@ -23,7 +23,7 @@ namespace tetris
         {
             {0, 0, 0},
             {0, 1, 0},
-            {0, 0, 0}
+            {1, 1, 1}
         };
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
@@ -72,7 +72,7 @@ namespace tetris
         public void Update()
         {            
             ClearArea();         
-            if (CheckBottomBorderMap())
+            if (CheckBottomBorderMap() || CheckFigureMapBelowShape())
             {
                 DrawShape();               
                 startPositionX = 4;
@@ -90,18 +90,24 @@ namespace tetris
             {
                 case Keys.Left:
                     ClearArea();
-                    if (CheckLeftBorder())
+                    if (CheckLeftBorderMap() && CheckFigureMapLeftShape())
                     {
                         startPositionX--;
                     }
                     break;
                 case Keys.Right:
                     ClearArea();
-                    startPositionX++;
+                    if (CheckRightBorderMap() && CheckFigureMapRightShape())
+                    {
+                        startPositionX++;                                      
+                    }
                     break;
                 case Keys.Down:
                     ClearArea();
-                    startPositionY++;
+                    if (!CheckBottomBorderMap() && !CheckFigureMapBelowShape())
+                    {
+                        startPositionY++;
+                    }
                     break;
                 //case Keys.Space:
                 //    ClearArea();
@@ -127,6 +133,54 @@ namespace tetris
             }
         }
 
+        private bool CheckFigureMapBelowShape()
+        {
+            for (int y = startPositionY; y < startPositionY + 3; y++)
+            {
+                for (int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1 && 
+                       (shape[y - startPositionY, x - startPositionX] == map[y + 1, x]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool CheckFigureMapLeftShape()
+        {
+            for (int y = startPositionY; y < startPositionY + 3; y++)
+            {
+                for (int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1 &&
+                        shape[y - startPositionY, x - startPositionX] == map[y, x - 1])
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool CheckFigureMapRightShape()
+        {
+            for (int y = startPositionY; y < startPositionY + 3; y++)
+            {
+                for (int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1 &&
+                        shape[y - startPositionY, x - startPositionX] == map[y, x + 1])
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private bool CheckBottomBorderMap()
         {
             for(int y = startPositionY + 2; y >= startPositionY; y--)
@@ -140,52 +194,34 @@ namespace tetris
             return false;
         }
 
-
-        private bool CheckLeftBorder()
+        private bool CheckLeftBorderMap()
         {
-            for (int x = 0; x < 3; x++)
+            for (int y = startPositionY; y < startPositionY + 3; y++)
             {
-                for (int y = 0; y < 3; y++)
+                for (int x = startPositionX; x < startPositionX + 3; x++)
                 {
-                    switch (x)
+                    if (shape[y - startPositionY, x - startPositionX] == 1 && x == 0)
                     {
-                        case 0:
-                            if (shape[y, x] == 1 && startPositionX > 0)
-                            {
-                                return true;
-                            }
-                            break;
-                        case 1:
-                            if (shape[y, x] == 1 && startPositionX + 1 > 0 && CheckColumnOne())
-                            {
-                                return true;
-                            }
-                            break;
-                        case 2:
-                            if (shape[y, x] == 1 && startPositionX + 2 > 0 && CheckColumnTwo())
-                            {
-                                return true;
-                            }
-                            break;
+                        return false;
                     }
                 }
             }
-            return false;
+            return true;
         }
 
-        private bool CheckColumnOne()
+        private bool CheckRightBorderMap()
         {
-            return shape[0, 0] == 0 && 
-                   shape[1, 0] == 0 && 
-                   shape[2, 0] == 0;
-        }
-
-        private bool CheckColumnTwo()
-        {
-            return shape[0, 1] == 0 &&
-                   shape[1, 1] == 0 &&
-                   shape[2, 1] == 0 &&
-                   CheckColumnOne();
+            for (int y = startPositionY; y < startPositionY + 3; y++)
+            {
+                for (int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1 && x == gameFieldWidthInCells - 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
