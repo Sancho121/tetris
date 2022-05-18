@@ -17,13 +17,15 @@ namespace tetris
         private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
         private int startPositionX = 4;
-        private int startPositionY = 0;        
-        
+        private int startPositionY = 0;
+
+        private List<int> filledCellsInLine = new List<int>();
+
         private int[,] shape = new int[3, 3]
         {
             {0, 0, 0},
             {0, 1, 0},
-            {1, 1, 1}
+            {0, 0, 0}
         };
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
@@ -71,16 +73,18 @@ namespace tetris
 
         public void Update()
         {            
-            ClearArea();         
+            ClearArea();            
             if (CheckBottomBorderMap() || CheckFigureMapBelowShape())
             {
-                DrawShape();               
+                DrawShape();
+                ClearFullLines();
                 startPositionX = 4;
                 startPositionY = 0;
             }
             else
             {
                 startPositionY++;
+                filledCellsInLine.Clear();
             }           
         }
 
@@ -222,6 +226,36 @@ namespace tetris
                 }
             }
             return true;
+        }     
+        
+        private void ClearFullLines()
+        {       
+            for(int y = 0; y < gameFieldHeightInCells; y++)
+            {
+                for(int x = 0; x < gameFieldWidthInCells; x++)
+                {
+                    if (map[y, x] == 1)
+                    {
+                        filledCellsInLine.Add(1);
+                    }
+                    else
+                    {
+                        filledCellsInLine.Clear();
+                        break;
+                    }
+                    if (filledCellsInLine.Count(t => t == 1) == gameFieldWidthInCells)
+                    {
+                        for (int z = y; z > 0; z--)
+                        {
+                            for (int k = 0; k < gameFieldWidthInCells; k++)
+                            {
+                                map[z, k] = map[z - 1, k];
+                            }
+                        }
+                        filledCellsInLine.Clear();
+                    }
+                }
+            }
         }
     }
 }
