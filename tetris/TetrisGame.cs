@@ -14,6 +14,7 @@ namespace tetris
         private readonly int gameFieldHeightInCells;
         private readonly int gameFieldWidthInCells;
         private readonly int cellSize;
+        private int points;
         private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
         private int startPositionX = 4;
@@ -23,9 +24,9 @@ namespace tetris
 
         private int[,] shape = new int[3, 3]
         {
-            {0, 0, 0},
             {0, 1, 0},
-            {0, 0, 0}
+            {0, 1, 0},
+            {0, 1, 0}
         };
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
@@ -84,7 +85,6 @@ namespace tetris
             else
             {
                 startPositionY++;
-                filledCellsInLine.Clear();
             }           
         }
 
@@ -229,7 +229,8 @@ namespace tetris
         }     
         
         private void ClearFullLines()
-        {       
+        {
+            int countFullLines = 0;
             for(int y = 0; y < gameFieldHeightInCells; y++)
             {
                 for(int x = 0; x < gameFieldWidthInCells; x++)
@@ -253,8 +254,30 @@ namespace tetris
                             }
                         }
                         filledCellsInLine.Clear();
+                        countFullLines++;                        
                     }
                 }
+            }
+            CountPoints(countFullLines);
+        }
+
+        private void CountPoints(int count)
+        {
+            if(count == 1)
+            {
+                points += 100;
+            }
+            if(count == 2)
+            {
+                points += 300;
+            }
+            if(count == 3)
+            {
+                points += 700;
+            }
+            if(count == 4)
+            {
+                points += 1500;
             }
         }
     }
