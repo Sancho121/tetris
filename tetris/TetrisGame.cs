@@ -14,7 +14,7 @@ namespace tetris
         private readonly int gameFieldHeightInCells;
         private readonly int gameFieldWidthInCells;
         private readonly int cellSize;
-        private int points;
+        public int points;
         private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
         private int startPositionX = 4;
@@ -24,9 +24,9 @@ namespace tetris
 
         private int[,] shape = new int[3, 3]
         {
-            {0, 1, 0},
-            {0, 1, 0},
-            {0, 1, 0}
+            {1, 1, 0},
+            {1, 1, 0},
+            {0, 0, 0}
         };
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
@@ -259,6 +259,7 @@ namespace tetris
                 }
             }
             CountPoints(countFullLines);
+            
         }
 
         private void CountPoints(int count)

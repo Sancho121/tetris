@@ -28,6 +28,7 @@ namespace tetris
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.tetris.Update();
+            label1.Text = tetris.points.ToString();
             this.pictureBox1.Refresh();
         }
 
