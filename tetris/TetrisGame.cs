@@ -14,20 +14,21 @@ namespace tetris
         private readonly int gameFieldHeightInCells;
         private readonly int gameFieldWidthInCells;
         private readonly int cellSize;
-        public int points;
         private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
         private int startPositionX = 4;
         private int startPositionY = 0;
 
         private List<int> filledCellsInLine = new List<int>();
+        
 
         private int[,] shape = new int[3, 3]
         {
-            {1, 1, 0},
-            {1, 1, 0},
-            {0, 0, 0}
+            {0, 1, 0},
+            {0, 1, 0},
+            {0, 1, 0}
         };
+        public int Points { get; set; }
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
         {
@@ -89,7 +90,7 @@ namespace tetris
         }
 
         public void Move(Keys direction)
-        {
+        {            
             switch (direction)
             {
                 case Keys.Left:
@@ -113,10 +114,10 @@ namespace tetris
                         startPositionY++;
                     }
                     break;
-                //case Keys.Space:
-                //    ClearArea();
-                //    startPositionY = gameFieldHeightInCells - 2;
-                //    break;
+                case Keys.Space:
+                    ClearArea();
+                    CheckPositionYBeforeKeySpace();                   
+                    break;
             }
         }
 
@@ -258,28 +259,62 @@ namespace tetris
                     }
                 }
             }
-            CountPoints(countFullLines);
-            
+            CountPoints(countFullLines);          
         }
 
         private void CountPoints(int count)
         {
             if(count == 1)
             {
-                points += 100;
+                Points += 100;
             }
             if(count == 2)
             {
-                points += 300;
+                Points += 300;
             }
             if(count == 3)
             {
-                points += 700;
+                Points += 700;
             }
             if(count == 4)
             {
-                points += 1500;
+                Points += 1500;
             }
+        }
+
+        private void CheckPositionYBeforeKeySpace()
+        {
+            int maxDistance = 0;
+            for (int y = startPositionY + 2; y >= startPositionY; y--)
+            {
+                for (int x = startPositionX; x < startPositionX + 3; x++)
+                {
+                    if (shape[y - startPositionY, x - startPositionX] == 1)
+                    {
+                        int distance = 0;
+                        for (int t = y + 1; t < gameFieldHeightInCells; t++)
+                        {
+                            if (map[t, x] == 0)
+                            {                                
+                                distance++;
+                                if (gameFieldHeightInCells - 1 - y == distance && maxDistance == 0)
+                                {
+                                    maxDistance = distance;
+                                }
+                            }
+                            else
+                            {
+                                if (maxDistance == 0 || maxDistance >= distance)
+                                {
+                                    maxDistance = distance;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            startPositionY += maxDistance;
         }
     }
 }

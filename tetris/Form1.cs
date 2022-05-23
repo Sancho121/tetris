@@ -28,8 +28,9 @@ namespace tetris
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.tetris.Update();
-            label1.Text = tetris.points.ToString();
+            label1.Text = tetris.Points.ToString();
             this.pictureBox1.Refresh();
+            
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
