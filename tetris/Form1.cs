@@ -12,30 +12,30 @@ namespace tetris
 {
     public partial class Form1 : Form
     {
-        TetrisGame tetris = new TetrisGame(20, 10, 20);
+        TetrisGame tetrisGame = new TetrisGame(20, 10, 20);
 
         public Form1()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            tetris.DrawShape();
-            tetris.Draw(e.Graphics);
+            tetrisGame.DrawShape();
+            tetrisGame.Draw(e.Graphics);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            this.tetris.Update();
-            label1.Text = tetris.Points.ToString();
+            this.tetrisGame.Update();
+            label1.Text = tetrisGame.Points.ToString();
             this.pictureBox1.Refresh();
             
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            this.tetris.Move(e.KeyCode);
+            this.tetrisGame.Move(e.KeyCode);
             this.pictureBox1.Refresh();
         }
     }
