@@ -20,8 +20,7 @@ namespace tetris
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            tetrisGame.DrawShape();
+        {            
             tetrisGame.Draw(e.Graphics);
         }
 

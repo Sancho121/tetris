@@ -14,19 +14,18 @@ namespace tetris
         private readonly int gameFieldHeightInCells;
         private readonly int gameFieldWidthInCells;
         private readonly int cellSize;
-        private int[,] map = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
+        private int[,] gameField = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
 
-        private int startPositionX = 4;
-        private int startPositionY = 0;
+        private int shapePositionX = 4;
+        private int shapePositionY = 0;
 
         private List<int> filledCellsInLine = new List<int>();
-        
 
         private int[,] shape = new int[3, 3]
         {
-            {0, 1, 0},
             {0, 0, 0},
-            {0, 0, 0}
+            {1, 1, 0},
+            {0, 1, 1}
         };
         public int Points { get; set; }
     
@@ -37,25 +36,15 @@ namespace tetris
             this.cellSize = cellSize;
         }
 
-        public void DrawShape()
-        {
-            for (int i = 0; i < shape.GetLength(0); i++)
-            {
-                for (int j = 0; j < shape.GetLength(1); j++)
-                {
-                    if (shape[i, j] == 1)
-                        map[startPositionY + i, startPositionX + j] = 1;
-                }
-            }
-        }
 
         public void Draw(Graphics graphics)
-        {           
+        {
+            DrawShape();
             for (int i = 0; i < gameFieldHeightInCells; i++)
             {
                 for (int j = 0; j < gameFieldWidthInCells; j++)
                 {
-                    if (map[i, j] == 1)
+                    if (gameField[i, j] == 1)
                     {
                         graphics.FillRectangle(Brushes.BlueViolet, j * cellSize, i * cellSize, cellSize, cellSize);
                     }
@@ -73,7 +62,6 @@ namespace tetris
             }
         }
 
-
         public void Update()
         {            
             ClearArea();            
@@ -81,18 +69,30 @@ namespace tetris
             {
                 DrawShape();
                 ClearFullLines();
-                startPositionX = 4;
-                startPositionY = 0;
+                shapePositionX = 4;
+                shapePositionY = 0;
             }
             else
             {
-                startPositionY++;
+                shapePositionY++;
             }
 
             if (GameOver())
             {                
                 Restart();
                 //MessageBox.Show("gg wp");               
+            }
+        }
+
+        private void DrawShape()
+        {
+            for (int i = 0; i < shape.GetLength(0); i++)
+            {
+                for (int j = 0; j < shape.GetLength(1); j++)
+                {
+                    if (shape[i, j] == 1)
+                        gameField[shapePositionY + i, shapePositionX + j] = 1;
+                }
             }
         }
 
@@ -104,26 +104,26 @@ namespace tetris
                     ClearArea();
                     if (CheckLeftBorderMap() && CheckFigureMapLeftShape())
                     {
-                        startPositionX--;
+                        shapePositionX--;
                     }
                     break;
                 case Keys.Right:
                     ClearArea();
                     if (CheckRightBorderMap() && CheckFigureMapRightShape())
                     {
-                        startPositionX++;                                      
+                        shapePositionX++;                                      
                     }
                     break;
                 case Keys.Down:
                     ClearArea();
                     if (!CheckBottomBorderMap() && !CheckFigureMapBelowShape())
                     {
-                        startPositionY++;
+                        shapePositionY++;
                     }
                     break;
                 case Keys.Space:
                     ClearArea();
-                    CheckPositionYBeforeKeySpace();                   
+                    shapePositionY += DistanceBetweenShapeAndFigureGameField();                   
                     break;
             }
         }
@@ -132,24 +132,24 @@ namespace tetris
             Points = 0;
             for (int y = 0; y < gameFieldHeightInCells; y++)
             {
-                for(int x = 0; x < gameFieldWidthInCells; x++)
+                for (int x = 0; x < gameFieldWidthInCells; x++)
                 {
-                    map[y, x] = 0;
+                    gameField[y, x] = 0;
                 }
             }            
         }
 
         private void ClearArea()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {                   
                     if (x >= 0 && y >= 0 && x < gameFieldWidthInCells && y < gameFieldHeightInCells)
                     {
-                        if(shape[y - startPositionY, x - startPositionX] == 1)
+                        if(shape[y - shapePositionY, x - shapePositionX] == 1)
                         {
-                            map[y, x] = 0;
+                            gameField[y, x] = 0;
                         }
                     }
                 }
@@ -158,12 +158,12 @@ namespace tetris
 
         private bool CheckFigureMapBelowShape()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 && 
-                       (shape[y - startPositionY, x - startPositionX] == map[y + 1, x]))
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 && 
+                       (shape[y - shapePositionY, x - shapePositionX] == gameField[y + 1, x]))
                     {
                         return true;
                     }
@@ -174,12 +174,12 @@ namespace tetris
 
         private bool CheckFigureMapLeftShape()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 &&
-                        shape[y - startPositionY, x - startPositionX] == map[y, x - 1])
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 &&
+                        shape[y - shapePositionY, x - shapePositionX] == gameField[y, x - 1])
                     {
                         return false;
                     }
@@ -190,12 +190,12 @@ namespace tetris
 
         private bool CheckFigureMapRightShape()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 &&
-                        shape[y - startPositionY, x - startPositionX] == map[y, x + 1])
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 &&
+                        shape[y - shapePositionY, x - shapePositionX] == gameField[y, x + 1])
                     {
                         return false;
                     }
@@ -206,11 +206,11 @@ namespace tetris
 
         private bool CheckBottomBorderMap()
         {
-            for(int y = startPositionY + shape.GetLength(0) - 1; y >= startPositionY; y--)
+            for(int y = shapePositionY + shape.GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for(int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for(int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 && gameFieldHeightInCells == y + 1)                   
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 && gameFieldHeightInCells == y + 1)                   
                         return true;
                 }
             }
@@ -219,11 +219,11 @@ namespace tetris
 
         private bool CheckLeftBorderMap()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 && x == 0)
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 && x == 0)
                     {
                         return false;
                     }
@@ -234,11 +234,11 @@ namespace tetris
 
         private bool CheckRightBorderMap()
         {
-            for (int y = startPositionY; y < startPositionY + shape.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + shape.GetLength(0); y++)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1 && x == gameFieldWidthInCells - 1)
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1 && x == gameFieldWidthInCells - 1)
                     {
                         return false;
                     }
@@ -254,7 +254,7 @@ namespace tetris
             {
                 for(int x = 0; x < gameFieldWidthInCells; x++)
                 {
-                    if (map[y, x] == 1)
+                    if (gameField[y, x] == 1)
                     {
                         filledCellsInLine.Add(1);
                     }
@@ -269,7 +269,7 @@ namespace tetris
                         {
                             for (int k = 0; k < gameFieldWidthInCells; k++)
                             {
-                                map[z, k] = map[z - 1, k];
+                                gameField[z, k] = gameField[z - 1, k];
                             }
                         }
                         filledCellsInLine.Clear();
@@ -300,19 +300,19 @@ namespace tetris
             }
         }
 
-        private void CheckPositionYBeforeKeySpace()
+        private int DistanceBetweenShapeAndFigureGameField()
         {
             int maxDistance = 0;
-            for (int y = startPositionY + shape.GetLength(0) - 1; y >= startPositionY; y--)
+            for (int y = shapePositionY + shape.GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for (int x = startPositionX; x < startPositionX + shape.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + shape.GetLength(1); x++)
                 {
-                    if (shape[y - startPositionY, x - startPositionX] == 1)
+                    if (shape[y - shapePositionY, x - shapePositionX] == 1)
                     {
                         int distance = 0;
                         for (int t = y + 1; t < gameFieldHeightInCells; t++)
                         {
-                            if (map[t, x] == 0)
+                            if (gameField[t, x] == 0)
                             {                                
                                 distance++;
                                 if (gameFieldHeightInCells - 1 - y == distance && maxDistance == 0)
@@ -332,7 +332,7 @@ namespace tetris
                     }
                 }
             }
-            startPositionY += maxDistance;
+            return maxDistance;
         }
 
         private bool GameOver()
@@ -342,7 +342,7 @@ namespace tetris
             {
                 for (int x = 0; x < gameFieldWidthInCells; x++)
                 {
-                    if (map[y, x] == 0)
+                    if (gameField[y, x] == 0)
                     {                        
                         continue;
                     }
