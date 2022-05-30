@@ -19,7 +19,7 @@ namespace tetris
         private int shapePositionX = 4;
         private int shapePositionY = 0;
         private int numberShape;
-
+      
         private Random random = new Random();
 
         private List<int> filledCellsInLine = new List<int>();       
@@ -142,7 +142,8 @@ namespace tetris
         }
 
         public void Move(Keys direction)
-        {            
+        {
+            
             switch (direction)
             {
                 case Keys.Left:
@@ -170,8 +171,9 @@ namespace tetris
                     ClearArea();
                     shapePositionY += DistanceBetweenShapeAndFigureGameField();                   
                     break;
-            }
+            }          
         }
+
         private void PreparationGameFieldForDrawShape()
         {         
             for (int i = 0; i < shapes[numberShape].GetLength(0); i++)
@@ -186,14 +188,8 @@ namespace tetris
         }
         private void Restart()
         {   
-            Points = 0;
-            for (int y = 0; y < gameFieldHeightInCells; y++)
-            {
-                for (int x = 0; x < gameFieldWidthInCells; x++)
-                {
-                    gameField[y, x] = 0;
-                }
-            }
+            Points = 0;            
+            Array.Clear(gameField, 0, gameField.Length);            
         }
 
         private void ClearArea()
@@ -334,27 +330,15 @@ namespace tetris
                     }
                 }
             }
-            CountPoints(countFullLines);          
+            if (countFullLines > 0)
+            {
+                CountPoints(countFullLines);          
+            }
         }
 
         private void CountPoints(int count)
         {
-            if(count == 1)
-            {
-                Points += 100;
-            }
-            if(count == 2)
-            {
-                Points += 300;
-            }
-            if(count == 3)
-            {
-                Points += 700;
-            }
-            if(count == 4)
-            {
-                Points += 1500;
-            }
+            Points += (int)(Math.Pow(2, count) * 100 - 100);
         }
 
         private int DistanceBetweenShapeAndFigureGameField()
