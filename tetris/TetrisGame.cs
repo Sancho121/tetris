@@ -318,11 +318,11 @@ namespace tetris
                     }
                     if (filledCellsInLine.Count(t => t == 1) == gameFieldWidthInCells)
                     {
-                        for (int z = y; z > 0; z--)
+                        for (int z = y; z >= 0; z--)
                         {
                             for (int k = 0; k < gameFieldWidthInCells; k++)
                             {
-                                gameField[z, k] = gameField[z - 1, k];
+                                gameField[z, k] = z == 0 ? 0 : gameField[z - 1, k];
                             }
                         }
                         filledCellsInLine.Clear();
@@ -378,23 +378,16 @@ namespace tetris
 
         private bool GameOver()
         {
-            int s = 0;
-            for (int y = 0; y < gameFieldHeightInCells; y++)
+            for (int y = shapePositionY + shapes[numberShape].GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for (int x = 0; x < gameFieldWidthInCells; x++)
+                for (int x = shapePositionX; x < shapePositionX + shapes[numberShape].GetLength(1); x++)
                 {
-                    if (gameField[y, x] == 0)
-                    {                        
-                        continue;
-                    }
-                    else
-                    {
-                        s++;
-                        break;
-                    }                   
+                    if (shapes[numberShape][y - shapePositionY, x - shapePositionX] == 1 &&
+                        shapes[numberShape][y - shapePositionY, x - shapePositionX] == gameField[y, x])
+                        return true;
                 }
             }
-            return s == 20;
+            return false;
         }
     }
 }
