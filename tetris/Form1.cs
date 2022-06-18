@@ -28,8 +28,7 @@ namespace tetris
         {
             this.tetrisGame.Update();
             label1.Text = tetrisGame.Points.ToString();
-            this.pictureBox1.Refresh();
-            
+            this.pictureBox1.Refresh();            
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)

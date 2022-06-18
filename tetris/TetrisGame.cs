@@ -19,7 +19,7 @@ namespace tetris
         private int shapePositionX = 4;
         private int shapePositionY = 0;
         private int numberShape;
-      
+
         private Random random = new Random();
 
         private List<int> filledCellsInLine = new List<int>();       
@@ -92,7 +92,6 @@ namespace tetris
             numberShape = random.Next(0, 7);
         }
 
-
         public void Draw(Graphics graphics)
         {
             PreparationGameFieldForDrawShape();
@@ -142,8 +141,7 @@ namespace tetris
         }
 
         public void Move(Keys direction)
-        {
-            
+        {          
             switch (direction)
             {
                 case Keys.Left:
@@ -160,18 +158,23 @@ namespace tetris
                         shapePositionX++;                                      
                     }
                     break;
-                case Keys.Down:
+                case Keys.Down:                   
                     ClearArea();
                     if (!CheckBottomBorderMap() && !CheckFigureMapBelowShape())
                     {
                         shapePositionY++;
                     }
                     break;
-                case Keys.Space:
+                case Keys.Space:                  
                     ClearArea();
-                    shapePositionY += DistanceBetweenShapeAndFigureGameField();                   
+                    shapePositionY += DistanceBetweenShapeAndFigureGameField();
+                    PreparationGameFieldForDrawShape();
+                    ClearFullLines();
+                    shapePositionX = 4;
+                    shapePositionY = 0;
+                    numberShape = random.Next(0, 7);
                     break;
-            }          
+            }
         }
 
         private void PreparationGameFieldForDrawShape()
