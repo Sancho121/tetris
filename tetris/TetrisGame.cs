@@ -357,7 +357,7 @@ namespace tetris
                         for (int t = y + 1; t < gameFieldHeightInCells; t++)
                         {
                             if (gameField[t, x] == 0)
-                            {                                
+                            {
                                 distance++;
                                 if (gameFieldHeightInCells - 1 - y == distance && maxDistance == 0)
                                 {
@@ -366,7 +366,11 @@ namespace tetris
                             }
                             else
                             {
-                                if (maxDistance == 0 || maxDistance >= distance)
+                                if (distance == 0)
+                                {
+                                    return 0;
+                                }
+                                if (maxDistance > distance || maxDistance == 0)
                                 {
                                     maxDistance = distance;
                                     break;
