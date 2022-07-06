@@ -17,7 +17,7 @@ namespace tetris
         public Form1()
         {
             InitializeComponent();
-            //tetrisGame.Restart();
+            tetrisGame.Restart();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)

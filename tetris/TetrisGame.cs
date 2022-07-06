@@ -18,85 +18,20 @@ namespace tetris
 
         private int shapePositionX = 4;
         private int shapePositionY = 0;
-        private int numberShape;
 
-        Figure figure;
+        private int[,] figure;
 
         private Random random = new Random();
 
         private List<int> filledCellsInLine = new List<int>();
-        //private List<int[,]> shapes = new List<int[,]>()
-        //{
-        //    new int[3, 3]
-        //    {
-        //        {0, 1, 0},
-        //        {0, 0, 0},
-        //        {0, 0, 0}
-        //    },
-
-        //    new int[3, 3]
-        //    {
-        //        {1, 1, 1},
-        //        {0, 1, 0},
-        //        {0, 0, 0}
-        //    },
-
-        //    new int[2, 2]
-        //    {
-        //        {1, 1},
-        //        {1, 1}
-        //    },
-
-        //    new int[3, 3]
-        //    {
-        //        {1, 1, 0},
-        //        {0, 1, 1},
-        //        {0, 0, 0}
-        //    },
-
-        //    new int[3, 3]
-        //    {
-        //        {0, 1, 0},
-        //        {0, 1, 0},
-        //        {0, 1, 1}
-        //    },
-
-        //    new int[3, 3]
-        //    {
-        //        {0, 1, 0},
-        //        {0, 1, 0},
-        //        {1, 1, 0}
-        //    },
-
-        //    new int[3, 3]
-        //    {
-        //        {0, 1, 1},
-        //        {1, 1, 0},
-        //        {0, 0, 0}
-        //    },
-
-        //    new int[4, 4]
-        //    {
-        //        {1, 1, 1, 1},
-        //        {0, 0, 0, 0},
-        //        {0, 0, 0, 0},
-        //        {0, 0, 0, 0}
-        //    }
-        //};
-
+        
         public int Points { get; set; }
     
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
         {
             this.gameFieldHeightInCells = gameFieldHeightInCells;
             this.gameFieldWidthInCells = gameFieldWidthInCells;
-            this.cellSize = cellSize;
-            numberShape = random.Next(0, 7);
-        }
-
-        public Figure CreateNewFigure(FigureType type, int[,] a)
-        {
-            return new Figure(type, a);
+            this.cellSize = cellSize;           
         }
 
         public void Draw(Graphics graphics)
@@ -127,7 +62,7 @@ namespace tetris
         {   
             Points = 0;
             Array.Clear(gameField, 0, gameField.Length);
-            figure = CreateNewFigure((FigureType)random.Next(0, 7), new int[4, 4]);
+            figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
         }
 
         public void Update()
@@ -139,7 +74,7 @@ namespace tetris
                 ClearFullLines();
                 shapePositionX = 4;
                 shapePositionY = 0;
-                numberShape = random.Next(0, 7);
+                figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
             }
             else
             {
@@ -185,18 +120,18 @@ namespace tetris
                     ClearFullLines();
                     shapePositionX = 4;
                     shapePositionY = 0;
-                    numberShape = random.Next(0, 7);                   
+                    figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
                     break;
             }
         }
 
         private void PreparationGameFieldForDrawShape()
         {         
-            for (int i = 0; i < figure.structure.GetLength(0); i++)
+            for (int i = 0; i < figure.GetLength(0); i++)
             {
-                for (int j = 0; j < figure.structure.GetLength(1); j++)
+                for (int j = 0; j < figure.GetLength(1); j++)
                 {
-                    if (figure.structure[i, j] == 1)
+                    if (figure[i, j] == 1)
                         gameField[shapePositionY + i, shapePositionX + j] = 1;
                 }
                 
@@ -205,13 +140,13 @@ namespace tetris
 
         private void ClearArea()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {                   
                     if (x >= 0 && y >= 0 && x < gameFieldWidthInCells && y < gameFieldHeightInCells)
                     {
-                        if(figure.structure[y - shapePositionY, x - shapePositionX] == 1)
+                        if(figure[y - shapePositionY, x - shapePositionX] == 1)
                         {
                             gameField[y, x] = 0;
                         }
@@ -222,12 +157,12 @@ namespace tetris
 
         private bool CheckFigureMapBelowShape()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 && 
-                       (figure.structure[y - shapePositionY, x - shapePositionX] == gameField[y + 1, x]))
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 && 
+                       (figure[y - shapePositionY, x - shapePositionX] == gameField[y + 1, x]))
                     {
                         return true;
                     }
@@ -238,12 +173,12 @@ namespace tetris
 
         private bool CheckFigureMapLeftShape()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 &&
-                        figure.structure[y - shapePositionY, x - shapePositionX] == gameField[y, x - 1])
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 &&
+                        figure[y - shapePositionY, x - shapePositionX] == gameField[y, x - 1])
                     {
                         return false;
                     }
@@ -254,12 +189,12 @@ namespace tetris
 
         private bool CheckFigureMapRightShape()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 &&
-                        figure.structure[y - shapePositionY, x - shapePositionX] == gameField[y, x + 1])
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 &&
+                        figure[y - shapePositionY, x - shapePositionX] == gameField[y, x + 1])
                     {
                         return false;
                     }
@@ -270,11 +205,11 @@ namespace tetris
 
         private bool CheckBottomBorderMap()
         {
-            for(int y = shapePositionY + figure.structure.GetLength(0) - 1; y >= shapePositionY; y--)
+            for(int y = shapePositionY + figure.GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for(int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for(int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 && gameFieldHeightInCells == y + 1)                   
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 && gameFieldHeightInCells == y + 1)                   
                         return true;
                 }
             }
@@ -283,11 +218,11 @@ namespace tetris
 
         private bool CheckLeftBorderMap()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 && x == 0)
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 && x == 0)
                     {
                         return false;
                     }
@@ -298,11 +233,11 @@ namespace tetris
 
         private bool CheckRightBorderMap()
         {
-            for (int y = shapePositionY; y < shapePositionY + figure.structure.GetLength(0); y++)
+            for (int y = shapePositionY; y < shapePositionY + figure.GetLength(0); y++)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 && x == gameFieldWidthInCells - 1)
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 && x == gameFieldWidthInCells - 1)
                     {
                         return false;
                     }
@@ -355,11 +290,11 @@ namespace tetris
         private int DistanceBetweenShapeAndFigureGameField()
         {
             int maxDistance = 0;
-            for (int y = shapePositionY + figure.structure.GetLength(0) - 1; y >= shapePositionY; y--)
+            for (int y = shapePositionY + figure.GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1)
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1)
                     {
                         int distance = 0;
                         for (int t = y + 1; t < gameFieldHeightInCells; t++)
@@ -393,12 +328,12 @@ namespace tetris
 
         private bool GameOver()
         {
-            for (int y = shapePositionY + figure.structure.GetLength(0) - 1; y >= shapePositionY; y--)
+            for (int y = shapePositionY + figure.GetLength(0) - 1; y >= shapePositionY; y--)
             {
-                for (int x = shapePositionX; x < shapePositionX + figure.structure.GetLength(1); x++)
+                for (int x = shapePositionX; x < shapePositionX + figure.GetLength(1); x++)
                 {
-                    if (figure.structure[y - shapePositionY, x - shapePositionX] == 1 &&
-                        figure.structure[y - shapePositionY, x - shapePositionX] == gameField[y, x])
+                    if (figure[y - shapePositionY, x - shapePositionX] == 1 &&
+                        figure[y - shapePositionY, x - shapePositionX] == gameField[y, x])
                         return true;
                 }
             }

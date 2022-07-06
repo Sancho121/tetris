@@ -6,94 +6,85 @@ using System.Threading.Tasks;
 
 namespace tetris
 {
-    enum FigureType
-    {
-        O,
-        J,
-        L,
-        S,
-        Z,
-        T,
-        I,
-        Point
-    }
-
     class Figure
     {
-        public FigureType type;
-        public int[,] structure;
-
-        public Figure(FigureType type, int[,] structure)
+        public static int[,] CreateNewFigure(FigureType type)
         {
-            this.type = type;
-            this.structure = structure;
+            switch (type)
+            {
+                case FigureType.O:
+                    return new int[4, 4]
+                    {
+                        {0, 1, 1, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.J:
+                    return new int[4, 4]
+                    {
+                        {0, 0, 1, 0},
+                        {0, 0, 1, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.L:
+                    return new int[4, 4]
+                    {
+                        {0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.S:
+                    return new int[4, 4]
+                    {
+                        {0, 0, 1, 1},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.Z:
+                    return new int[4, 4]
+                    {
+                        {0, 1, 1, 0},
+                        {0, 0, 1, 1},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.T:
+                    return new int[4, 4]
+                    {
+                        {0, 1, 1, 1},
+                        {0, 0, 1, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+                case FigureType.I:
+                    return new int[4, 4]
+                    {
+                        {0, 0, 0, 0},
+                        {1, 1, 1, 1},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0}
+                    };
+                case FigureType.Point:
+                    return new int[4, 4]
+                    {
+                        {0, 0, 1, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+                default:
+                    return new int[4, 4]
+                    {
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                    };
+            }
         }
-
-        private List<Figure> shapes1 = new List<Figure>()
-        {
-            new Figure(FigureType.O, new int[4, 4]
-            {
-                {0, 1, 1, 0},
-                {0, 1, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.J, new int[4, 4]
-            {
-                {0, 0, 1, 0},
-                {0, 0, 1, 0},
-                {0, 1, 1, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.L, new int[4, 4]
-            {
-                {0, 1, 0, 0},
-                {0, 1, 0, 0},
-                {0, 1, 1, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.S, new int[4, 4]
-            {
-                {0, 0, 1, 1},
-                {0, 1, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.Z, new int[4, 4]
-            {
-                {0, 1, 1, 0},
-                {0, 0, 1, 1},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.T, new int[4, 4]
-            {
-                {0, 1, 1, 1},
-                {0, 0, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-            }),
-
-            new Figure(FigureType.I, new int[4, 4]
-            {
-                {0, 0, 0, 0},
-                {1, 1, 1, 1},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0}
-            }),
-
-            new Figure(FigureType.Point, new int[4, 4]
-            {
-                {0, 0, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-            })
-        };
     }
 }
