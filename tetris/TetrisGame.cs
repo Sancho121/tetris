@@ -14,38 +14,25 @@ namespace tetris
         private readonly int gameFieldHeightInCells;
         private readonly int gameFieldWidthInCells;
         private readonly int cellSize;
-        private int[,] gameField = new int[20, 10]; // 1 - заполненная клетка, 0 - пустая
+        private int[,] gameField;
 
-        private int figurePositionX = 4;
-        private int figurePositionY = 0;
-
-        private int[,] figure;
+        private Figure figure;
 
         private Random random = new Random();
 
-        private List<int> filledCellsInLine = new List<int>();
-        
         public int Points { get; set; }
-    
+
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
         {
             this.gameFieldHeightInCells = gameFieldHeightInCells;
             this.gameFieldWidthInCells = gameFieldWidthInCells;
             this.cellSize = cellSize;
+            gameField = new int[gameFieldHeightInCells, gameFieldWidthInCells];
         }
 
         public void Draw(Graphics graphics)
         {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1)
-                    {
-                        graphics.FillRectangle(Brushes.BlueViolet, x * cellSize, y * cellSize, cellSize, cellSize);                       
-                    }
-                }
-            }
+            figure.DrowFigure(graphics, cellSize);
             for (int y = 0; y < gameFieldHeightInCells; y++)
             {
                 for (int x = 0; x < gameFieldWidthInCells; x++)
@@ -67,20 +54,8 @@ namespace tetris
             }
         }
 
-        private void AddFigureIngameField()
-        {
-            for (int y = 0; y < figure.GetLength(0); y++)
-            {
-                for (int x = 0; x < figure.GetLength(1); x++)
-                {
-                    if (figure[y, x] == 1)
-                        gameField[figurePositionY + y, figurePositionX + x] = 1;
-                }
-            }
-        }
-
         public void Restart()
-        {   
+        {
             Points = 0;
             Array.Clear(gameField, 0, gameField.Length);
             figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
@@ -88,167 +63,106 @@ namespace tetris
 
         public void Update()
         {
-            if (CheckBottomBorderMap() || CheckFigureMapBelowShape())
+            if (IsPossibleMoveDown())
             {
-                AddFigureIngameField();
-                ClearFullLines();
-                figurePositionX = 4;
-                figurePositionY = 0;
-                figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
+                figure.figurePositionY++;
             }
             else
             {
-                figurePositionY++;
+                AddFigureIngameField();
+                ClearFullLines();
+                figure.figurePositionX = 4;
+                figure.figurePositionY = 0;
+                figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
             }
 
             if (GameOver())
             {
                 Restart();
-                //MessageBox.Show("gg wp");
             }
         }
 
         public void Move(Keys direction)
-        {          
+        {
             switch (direction)
             {
                 case Keys.Left:
-                    if (CheckLeftBorderMap() && CheckFigureMapLeftShape())
+                    if (IsPossibleMoveLeft())
                     {
-                        figurePositionX--;
+                        figure.figurePositionX--;
                     }
                     break;
                 case Keys.Right:
-                    if (CheckRightBorderMap() && CheckFigureMapRightShape())
+                    if (IsPossibleMoveRight())
                     {
-                        figurePositionX++;                                      
+                        figure.figurePositionX++;
                     }
                     break;
-                case Keys.Down:                   
-                    if (!CheckBottomBorderMap() && !CheckFigureMapBelowShape())
+                case Keys.Down:
+                    if (IsPossibleMoveDown())
                     {
-                        figurePositionY++;
+                        figure.figurePositionY++;
                     }
                     break;
                 case Keys.Space:
-                    figurePositionY += DistanceBetweenShapeAndFigureGameField();
+                    while (IsPossibleMoveDown())
+                    {
+                        figure.figurePositionY++;
+                    }
                     AddFigureIngameField();
                     ClearFullLines();
-                    figurePositionX = 4;
-                    figurePositionY = 0;
+                    figure.figurePositionX = 4;
+                    figure.figurePositionY = 0;
                     figure = Figure.CreateNewFigure((FigureType)random.Next(0, 7));
                     break;
             }
-        }     
-
-        private bool CheckFigureMapBelowShape()
+        }
+        private void AddFigureIngameField()
         {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
+            foreach (Point point in figure.GetFigurePoints())
             {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 && 
-                       (figure[y - figurePositionY, x - figurePositionX] == gameField[y + 1, x]))
-                    {
-                        return true;
-                    }
-                }
+                gameField[point.Y, point.X] = 1;
             }
-            return false;
         }
 
-        private bool CheckFigureMapLeftShape()
+        private bool IsPossibleMoveLeft()
         {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 &&
-                        figure[y - figurePositionY, x - figurePositionX] == gameField[y, x - 1])
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return figure.GetFigurePoints().All(point => point.X != 0 && gameField[point.Y, point.X - 1] == 0);
         }
 
-        private bool CheckFigureMapRightShape()
+        private bool IsPossibleMoveRight()
         {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 &&
-                        figure[y - figurePositionY, x - figurePositionX] == gameField[y, x + 1])
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return figure.GetFigurePoints().All(point => point.X != gameFieldWidthInCells - 1 && gameField[point.Y, point.X + 1] == 0);
         }
 
-        private bool CheckBottomBorderMap()
+        private bool IsPossibleMoveDown()
         {
-            for(int y = figurePositionY + figure.GetLength(0) - 1; y >= figurePositionY; y--)
-            {
-                for(int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 && gameFieldHeightInCells == y + 1)                   
-                        return true;
-                }
-            }
-            return false;
+            return figure.GetFigurePoints().All(point => point.Y != gameFieldHeightInCells - 1 && gameField[point.Y + 1, point.X] == 0);
         }
 
-        private bool CheckLeftBorderMap()
+        private bool GameOver()
         {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 && x == 0)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return figure.GetFigurePoints().Any(point => gameField[point.Y, point.X] == 1);
         }
 
-        private bool CheckRightBorderMap()
-        {
-            for (int y = figurePositionY; y < figurePositionY + figure.GetLength(0); y++)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 && x == gameFieldWidthInCells - 1)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }     
-        
         private void ClearFullLines()
         {
             int countFullLines = 0;
-            for(int y = 0; y < gameFieldHeightInCells; y++)
+            for (int y = 0; y < gameFieldHeightInCells; y++)
             {
-                for(int x = 0; x < gameFieldWidthInCells; x++)
+                int filledCellsInLine = 0;
+                for (int x = 0; x < gameFieldWidthInCells; x++)
                 {
                     if (gameField[y, x] == 1)
                     {
-                        filledCellsInLine.Add(1);
+                        filledCellsInLine++;
                     }
                     else
                     {
-                        filledCellsInLine.Clear();
+                        filledCellsInLine = 0;
                         break;
                     }
-                    if (filledCellsInLine.Count(t => t == 1) == gameFieldWidthInCells)
+                    if (filledCellsInLine == gameFieldWidthInCells)
                     {
                         for (int z = y; z >= 0; z--)
                         {
@@ -257,73 +171,20 @@ namespace tetris
                                 gameField[z, k] = z == 0 ? 0 : gameField[z - 1, k];
                             }
                         }
-                        filledCellsInLine.Clear();
-                        countFullLines++;                        
+                        filledCellsInLine = 0;
+                        countFullLines++;
                     }
                 }
             }
             if (countFullLines > 0)
             {
-                CountPoints(countFullLines);          
+                CountPoints(countFullLines);
             }
         }
 
         private void CountPoints(int count)
         {
             Points += (int)(Math.Pow(2, count) * 100 - 100);
-        }
-
-        private int DistanceBetweenShapeAndFigureGameField()
-        {
-            int maxDistance = 0;
-            for (int y = figurePositionY + figure.GetLength(0) - 1; y >= figurePositionY; y--)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1)
-                    {
-                        int distance = 0;
-                        for (int t = y + 1; t < gameFieldHeightInCells; t++)
-                        {
-                            if (gameField[t, x] == 0)
-                            {
-                                distance++;
-                                if (gameFieldHeightInCells - 1 - y == distance && maxDistance == 0)
-                                {
-                                    maxDistance = distance;
-                                }
-                            }
-                            else
-                            {
-                                if (distance == 0)
-                                {
-                                    return 0;
-                                }
-                                if (maxDistance > distance || maxDistance == 0)
-                                {
-                                    maxDistance = distance;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return maxDistance;
-        }
-
-        private bool GameOver()
-        {
-            for (int y = figurePositionY + figure.GetLength(0) - 1; y >= figurePositionY; y--)
-            {
-                for (int x = figurePositionX; x < figurePositionX + figure.GetLength(1); x++)
-                {
-                    if (figure[y - figurePositionY, x - figurePositionX] == 1 &&
-                        figure[y - figurePositionY, x - figurePositionX] == gameField[y, x])
-                        return true;
-                }
-            }
-            return false;
         }
     }
 }
