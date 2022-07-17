@@ -29,7 +29,7 @@ namespace tetris
             }
         }
 
-        public Point[] GetFigurePoints()
+        public List<Point> GetFigurePoints()
         {
             List<Point> figurePoints = new List<Point>();
 
@@ -41,7 +41,7 @@ namespace tetris
                         figurePoints.Add(new Point(figurePositionX + x, figurePositionY + y));
                 }
             }
-            return figurePoints.ToArray();
+            return figurePoints;
         }
 
         public static Figure CreateNewFigure(FigureType type)
