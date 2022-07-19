@@ -58,7 +58,7 @@ namespace tetris
         {
             Points = 0;
             Array.Clear(gameField, 0, gameField.Length);
-            figure = Figure.CreateNewFigure((FigureType)random.Next(0, Enum.GetNames(typeof(FigureType)).Length));
+            figure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
         }
 
         public void Update()
@@ -73,7 +73,7 @@ namespace tetris
                 ClearFullLines();
                 figure.figurePositionX = 4;
                 figure.figurePositionY = 0;
-                figure = Figure.CreateNewFigure((FigureType)random.Next(0, Enum.GetNames(typeof(FigureType)).Length));
+                figure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
             }
 
             if (GameOver())
