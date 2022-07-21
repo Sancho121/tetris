@@ -24,18 +24,24 @@ namespace tetris
         {            
             tetrisGame.Draw(e.Graphics);
         }
+        private void pictureBox2_Paint(object sender, PaintEventArgs e)
+        {
+            tetrisGame.DrawNextFigure(e.Graphics);
+        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.tetrisGame.Update();
             label1.Text = tetrisGame.Points.ToString();
-            this.pictureBox1.Refresh();            
+            this.pictureBox1.Refresh();
+            this.pictureBox2.Refresh();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             this.tetrisGame.Move(e.KeyCode);
             this.pictureBox1.Refresh();
+            this.pictureBox2.Refresh();
         }
     }
 }

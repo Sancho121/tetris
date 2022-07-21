@@ -17,6 +17,7 @@ namespace tetris
         private int[,] gameField;
 
         private Figure figure;
+        private Figure nextFigure;
 
         private Random random = new Random();
 
@@ -54,11 +55,18 @@ namespace tetris
             }
         }
 
+        public void DrawNextFigure(Graphics graphics)
+        {
+            graphics.DrawRectangle(new Pen(Color.Black), 0, 0, 80, 80);         
+            nextFigure.DrowFigure(graphics, cellSize);
+        }
+
         public void Restart()
         {
             Points = 0;
             Array.Clear(gameField, 0, gameField.Length);
             figure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
+            nextFigure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
         }
 
         public void Update()
@@ -73,7 +81,8 @@ namespace tetris
                 ClearFullLines();
                 figure.figurePositionX = 4;
                 figure.figurePositionY = 0;
-                figure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
+                figure = Figure.CreateNewFigure(nextFigure.type);
+                nextFigure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
             }
 
             if (GameOver())
