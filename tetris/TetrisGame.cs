@@ -57,8 +57,18 @@ namespace tetris
 
         public void DrawNextFigure(Graphics graphics)
         {
-            graphics.DrawRectangle(new Pen(Color.Black), 0, 0, 80, 80);         
-            nextFigure.DrowFigure(graphics, cellSize);
+            graphics.DrawRectangle(new Pen(Color.Black), 0, 0, 80, 80);
+            
+            for (int y = 0; y < nextFigure.structureFigure.GetLength(0); y++)
+            {
+                for (int x = 0; x < nextFigure.structureFigure.GetLength(1); x++)
+                {
+                    if (nextFigure.structureFigure[y, x] == 1)
+                    {
+                        graphics.FillRectangle(Brushes.BlueViolet, x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
         }
 
         public void Restart()
