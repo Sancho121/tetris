@@ -58,7 +58,7 @@ namespace tetris
         public void DrawNextFigure(Graphics graphics)
         {
             graphics.DrawRectangle(new Pen(Color.Black), 0, 0, 80, 80);
-            
+
             for (int y = 0; y < nextFigure.structureFigure.GetLength(0); y++)
             {
                 for (int x = 0; x < nextFigure.structureFigure.GetLength(1); x++)
@@ -130,8 +130,12 @@ namespace tetris
                     }
                     Update();
                     break;
+                case Keys.Up:
+                    figure.RotateFigure();
+                    break;
             }
-        }
+        }        
+
         private void AddFigureIngameField()
         {
             foreach (Point point in figure.GetFigurePoints())
