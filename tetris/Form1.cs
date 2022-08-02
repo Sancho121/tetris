@@ -32,7 +32,7 @@ namespace tetris
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.tetrisGame.Update();
-            label1.Text = tetrisGame.Points.ToString();
+            label1.Text = tetrisGame.Score.ToString();
             this.pictureBox1.Refresh();
             this.pictureBox2.Refresh();
         }

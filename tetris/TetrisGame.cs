@@ -19,9 +19,7 @@ namespace tetris
         private Figure figure;
         private Figure nextFigure;
 
-        private Random random = new Random();
-
-        public int Points { get; set; }
+        public int Score { get; private set; }
 
         public TetrisGame(int gameFieldHeightInCells, int gameFieldWidthInCells, int cellSize)
         {
@@ -33,7 +31,7 @@ namespace tetris
 
         public void Draw(Graphics graphics)
         {
-            figure.DrowFigure(graphics, cellSize);
+            figure.DrawFigure(graphics, cellSize);
             for (int y = 0; y < gameFieldHeightInCells; y++)
             {
                 for (int x = 0; x < gameFieldWidthInCells; x++)
@@ -57,26 +55,16 @@ namespace tetris
 
         public void DrawNextFigure(Graphics graphics)
         {
-            graphics.DrawRectangle(new Pen(Color.Black), 0, 0, 80, 80);
-
-            for (int y = 0; y < nextFigure.structureFigure.GetLength(0); y++)
-            {
-                for (int x = 0; x < nextFigure.structureFigure.GetLength(1); x++)
-                {
-                    if (nextFigure.structureFigure[y, x] == 1)
-                    {
-                        graphics.FillRectangle(Brushes.BlueViolet, x * cellSize, y * cellSize, cellSize, cellSize);
-                    }
-                }
-            }
+            graphics.DrawRectangle(Pens.Black, 0, 0, 80, 80);
+            nextFigure.DrawFigure(graphics, cellSize);
         }
 
         public void Restart()
         {
-            Points = 0;
+            Score = 0;
             Array.Clear(gameField, 0, gameField.Length);
-            figure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
-            nextFigure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
+            figure = Figure.CreateRandomFigure(4, 0);
+            nextFigure = Figure.CreateRandomFigure(0, 0);
         }
 
         public void Update()
@@ -87,15 +75,15 @@ namespace tetris
             }
             else
             {
-                AddFigureIngameField();
+                AttachFigureToGameField();
                 ClearFullLines();
-                figure.figurePositionX = 4;
-                figure.figurePositionY = 0;
-                figure = Figure.CreateNewFigure(nextFigure.type);
-                nextFigure = Figure.CreateNewFigure((FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length));
+                nextFigure.figurePositionX = 4;
+                nextFigure.figurePositionY = 0;
+                figure = nextFigure;
+                nextFigure = Figure.CreateRandomFigure(0, 0);
             }
 
-            if (GameOver())
+            if (IsGameOver())
             {
                 Restart();
             }
@@ -131,12 +119,12 @@ namespace tetris
                     Update();
                     break;
                 case Keys.Up:
-                    figure.RotateFigure();
+                    figure.RotateFigure();                  
                     break;
             }
-        }        
+        }
 
-        private void AddFigureIngameField()
+        private void AttachFigureToGameField()
         {
             foreach (Point point in figure.GetFigurePoints())
             {
@@ -159,7 +147,7 @@ namespace tetris
             return figure.GetFigurePoints().All(point => point.Y != gameFieldHeightInCells - 1 && gameField[point.Y + 1, point.X] == 0);
         }
 
-        private bool GameOver()
+        private bool IsGameOver()
         {
             return figure.GetFigurePoints().Any(point => gameField[point.Y, point.X] == 1);
         }
@@ -197,13 +185,13 @@ namespace tetris
             }
             if (countFullLines > 0)
             {
-                CountPoints(countFullLines);
+                UpdateScore(countFullLines);
             }
         }
 
-        private void CountPoints(int count)
+        private void UpdateScore(int fullLinesCount)
         {
-            Points += (int)(Math.Pow(2, count) * 100 - 100);
+            Score += (int)(Math.Pow(2, fullLinesCount) * 100 - 100);
         }
     }
 }

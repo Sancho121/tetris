@@ -9,26 +9,29 @@ namespace tetris
 {
     class Figure
     {
-        public int figurePositionX = 4;
-        public int figurePositionY = 0;
+        public int figurePositionX;
+        public int figurePositionY;
 
-        private int countRotateFigure = 0;
+        private int stateRotateFigure = 0;
+        private static Random random = new Random();
 
-        public int ReferencePointStructureFigureX { get; private set; }
-        public int ReferencePointStructureFigureY { get; private set; }
+        private int referencePointStructureFigureX;
+        private int referencePointStructureFigureY;
 
-        public FigureType type;
+        private FigureType type;
         public int[,] structureFigure;
 
-        public Figure(FigureType type, int[,] structureFigure, int referencePointStructureFigureY, int referencePointStructureFigureX)
+        private Figure(FigureType type, int[,] structureFigure, int referencePointStructureFigureY, int referencePointStructureFigureX, int figurePositionX, int figurePositionY)
         {
             this.type = type;
             this.structureFigure = structureFigure;
-            ReferencePointStructureFigureY = referencePointStructureFigureY;
-            ReferencePointStructureFigureX = referencePointStructureFigureX;
+            this.referencePointStructureFigureY = referencePointStructureFigureY;
+            this.referencePointStructureFigureX = referencePointStructureFigureX;
+            this.figurePositionX = figurePositionX;
+            this.figurePositionY = figurePositionY;
         }
 
-        public void DrowFigure(Graphics graphics, int cellSize)
+        public void DrawFigure(Graphics graphics, int cellSize)
         {
             foreach (Point point in GetFigurePoints())
             {
@@ -51,23 +54,9 @@ namespace tetris
             return figurePoints;
         }
 
-        public List<Point> GetStructureFigurePoints()
+        public static Figure CreateRandomFigure(int figurePositionX, int figurePositionY)
         {
-            List<Point> figureStructurePoints = new List<Point>();
-
-            for (int y = 0; y < structureFigure.GetLength(0); y++)
-            {
-                for (int x = 0; x < structureFigure.GetLength(1); x++)
-                {
-                    if (structureFigure[y, x] == 1)
-                        figureStructurePoints.Add(new Point(x, y));
-                }
-            }
-            return figureStructurePoints;
-        }
-
-        public static Figure CreateNewFigure(FigureType type)
-        {
+            FigureType type = (FigureType)random.Next(Enum.GetNames(typeof(FigureType)).Length);
             switch (type)
             {
                 case FigureType.O:
@@ -77,7 +66,7 @@ namespace tetris
                         {0, 1, 1, 0},
                         {0, 0, 0, 0},
                         {0, 0, 0, 0},
-                    }, 0, 0);
+                    }, 0, 0, figurePositionX, figurePositionY);
                 case FigureType.J:
                     return new Figure(type, new int[4, 4]
                     {
@@ -85,7 +74,7 @@ namespace tetris
                         {0, 0, 1, 0},
                         {0, 0, 1, 0},
                         {0, 1, 1, 0},
-                    }, 2, 2);
+                    }, 2, 2, figurePositionX, figurePositionY);
                 case FigureType.L:
                     return new Figure(type, new int[4, 4]
                     {
@@ -93,7 +82,7 @@ namespace tetris
                         {0, 1, 0, 0},
                         {0, 1, 0, 0},
                         {0, 1, 1, 0},
-                    }, 2, 1);
+                    }, 2, 1, figurePositionX, figurePositionY);
                 case FigureType.S:
                     return new Figure(type, new int[4, 4]
                     {
@@ -101,7 +90,7 @@ namespace tetris
                         {0, 1, 1, 0},
                         {1, 1, 0, 0},
                         {0, 0, 0, 0},
-                    }, 2, 1);
+                    }, 2, 1, figurePositionX, figurePositionY);
                 case FigureType.Z:
                     return new Figure(type, new int[4, 4]
                     {
@@ -109,7 +98,7 @@ namespace tetris
                         {1, 1, 0, 0},
                         {0, 1, 1, 0},
                         {0, 0, 0, 0},
-                    }, 2, 1);
+                    }, 2, 1, figurePositionX, figurePositionY);
                 case FigureType.T:
                     return new Figure(type, new int[4, 4]
                     {
@@ -117,7 +106,7 @@ namespace tetris
                         {1, 1, 1, 0},
                         {0, 1, 0, 0},
                         {0, 0, 0, 0},
-                    }, 1, 1);
+                    }, 1, 1, figurePositionX, figurePositionY);
                 case FigureType.I:
                     return new Figure(type, new int[4, 4]
                     {
@@ -125,7 +114,7 @@ namespace tetris
                         {1, 1, 1, 1},
                         {0, 0, 0, 0},
                         {0, 0, 0, 0}
-                    }, 1, 1);
+                    }, 1, 1, figurePositionX, figurePositionY);
                 case FigureType.Point:
                     return new Figure(type, new int[4, 4]
                     {
@@ -133,7 +122,7 @@ namespace tetris
                         {0, 0, 0, 0},
                         {0, 0, 0, 0},
                         {0, 0, 0, 0},
-                    }, 0, 0);
+                    }, 0, 0, figurePositionX, figurePositionY);
                 default:
                     return new Figure(type, new int[4, 4]
                     {
@@ -141,28 +130,28 @@ namespace tetris
                         {0, 0, 0, 0},
                         {0, 0, 0, 0},
                         {0, 0, 0, 0},
-                    }, 0, 0);
+                    }, 0, 0, figurePositionX, figurePositionY);
             }
         }
 
         public void RotateFigure()
         {
-            int referencePointFigureX = ReferencePointStructureFigureX + figurePositionX;
-            int referencePointFigureY = ReferencePointStructureFigureY + figurePositionY;
+            int referencePointFigureX = referencePointStructureFigureX + figurePositionX;
+            int referencePointFigureY = referencePointStructureFigureY + figurePositionY;
 
             if (type == FigureType.O || type == FigureType.Point)
                 return;
 
             if (type == FigureType.I || type == FigureType.S || type == FigureType.Z)
             {
-                if (countRotateFigure % 2 == 0)
+                if (stateRotateFigure == 0)
                 {
-                    countRotateFigure++;
+                    stateRotateFigure++;
                     RotateFigureClockWise(GetFigurePoints(), referencePointFigureX, referencePointFigureY);
                 }
                 else
                 {
-                    countRotateFigure--;
+                    stateRotateFigure--;
                     RotateFigureCounterClockWise(GetFigurePoints(), referencePointFigureX, referencePointFigureY);
                 }
             }
