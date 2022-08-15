@@ -18,6 +18,8 @@ namespace tetris
         private int referencePointStructureFigureX;
         private int referencePointStructureFigureY;
 
+        public List<Point> rotateFigurePoints = new List<Point>();
+
         private FigureType type;
         public int[,] structureFigure;
 
@@ -133,47 +135,35 @@ namespace tetris
                     }, 0, 0, figurePositionX, figurePositionY);
             }
         }
-
-        public void RotateFigure()
+        public void RotateFigurePoints()
         {
             int referencePointFigureX = referencePointStructureFigureX + figurePositionX;
             int referencePointFigureY = referencePointStructureFigureY + figurePositionY;
 
-            if (type == FigureType.O || type == FigureType.Point)
-                return;
-
-            if (type == FigureType.I || type == FigureType.S || type == FigureType.Z)
-            {
-                if (stateRotateFigure == 0)
-                {
-                    stateRotateFigure++;
-                    RotateFigureClockWise(GetFigurePoints(), referencePointFigureX, referencePointFigureY);
-                }
-                else
-                {
-                    stateRotateFigure--;
-                    RotateFigureCounterClockWise(GetFigurePoints(), referencePointFigureX, referencePointFigureY);
-                }
-            }
+            //if (type == FigureType.I || type == FigureType.S || type == FigureType.Z)
+            //{
+            //    if (stateRotateFigure == 0)
+            //    {
+            //        stateRotateFigure++;
+            //        rotateFigurePoints = GetFigurePoints().ConvertAll(point => new Point(referencePointFigureX + referencePointFigureY - point.Y, referencePointFigureY + point.X - referencePointFigureX));                   
+            //    }
+            //    else
+            //    {
+            //        stateRotateFigure--;
+            //        rotateFigurePoints = GetFigurePoints().ConvertAll(point => new Point(point.Y - referencePointFigureY + referencePointFigureX, referencePointFigureX + referencePointFigureY - point.X));
+            //    }
+            //}
 
             if (type == FigureType.T || type == FigureType.J || type == FigureType.L)
             {
-                RotateFigureClockWise(GetFigurePoints(), referencePointFigureX, referencePointFigureY);
+                rotateFigurePoints = GetFigurePoints().ConvertAll(point => new Point(referencePointFigureX + referencePointFigureY - point.Y, referencePointFigureY + point.X - referencePointFigureX));
             }
         }
 
-        private void RotateFigureClockWise(List<Point> figurePoints, int pX, int pY)
+        public void RotateFigure(List<Point> rotateFigurePoints)
         {
             Array.Clear(structureFigure, 0, structureFigure.Length);
-            figurePoints.ConvertAll(point => new Point(pX + pY - point.Y, pY + point.X - pX))
-                        .ForEach(point => structureFigure[point.Y - figurePositionY, point.X - figurePositionX] = 1);
-        }
-
-        private void RotateFigureCounterClockWise(List<Point> figurePoints, int pX, int pY)
-        {
-            Array.Clear(structureFigure, 0, structureFigure.Length);
-            figurePoints.ConvertAll(point => new Point(point.Y - pY + pX, pX + pY - point.X))
-                        .ForEach(point => structureFigure[point.Y - figurePositionY, point.X - figurePositionX] = 1);
+            rotateFigurePoints.ForEach(point => structureFigure[point.Y - figurePositionY, point.X - figurePositionX] = 1);
         }
     }
 }

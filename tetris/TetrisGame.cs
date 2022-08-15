@@ -119,9 +119,26 @@ namespace tetris
                     Update();
                     break;
                 case Keys.Up:
-                    figure.RotateFigure();                  
+                    if (IsPossibleRotateFigure())
+                    {
+                        figure.RotateFigure(figure.rotateFigurePoints);
+                    }
                     break;
             }
+        }
+
+        private bool IsPossibleRotateFigure()
+        {
+            figure.RotateFigurePoints();
+
+            if (figure.rotateFigurePoints.Count == 0)
+                return false;
+
+            return figure.rotateFigurePoints.All(point => point.X >= 0 &&
+                                point.Y >= 0 &&
+                                point.Y < gameFieldHeightInCells &&
+                                point.X < gameFieldWidthInCells &&
+                                gameField[point.Y, point.X] == 0);
         }
 
         private void AttachFigureToGameField()
