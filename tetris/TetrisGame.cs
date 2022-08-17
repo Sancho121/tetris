@@ -18,6 +18,7 @@ namespace tetris
 
         private Figure figure;
         private Figure nextFigure;
+        private Figure copyFigure;
 
         public int Score { get; private set; }
 
@@ -121,7 +122,8 @@ namespace tetris
                 case Keys.Up:
                     if (IsPossibleRotateFigure())
                     {
-                        figure.RotateFigure(figure.rotateFigurePoints);
+                        figure.RotateFigurePoints();
+                        figure.RotateFigure(figure.rotateFigurePoints);                       
                     }
                     break;
             }
@@ -129,12 +131,13 @@ namespace tetris
 
         private bool IsPossibleRotateFigure()
         {
-            figure.RotateFigurePoints();
+            copyFigure = figure.CreateCopyFigure();
+            copyFigure.RotateFigurePoints();
 
-            if (figure.rotateFigurePoints.Count == 0)
+            if (copyFigure.rotateFigurePoints.Count == 0)
                 return false;
 
-            return figure.rotateFigurePoints.All(point => point.X >= 0 &&
+            return copyFigure.rotateFigurePoints.All(point => point.X >= 0 &&
                                 point.Y >= 0 &&
                                 point.Y < gameFieldHeightInCells &&
                                 point.X < gameFieldWidthInCells &&
