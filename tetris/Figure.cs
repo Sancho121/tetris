@@ -164,7 +164,7 @@ namespace tetris
 
             if (type == FigureType.T || type == FigureType.J || type == FigureType.L)
             {
-                rotateFigurePoints = GetFigurePoints().ConvertAll(point => new Point(referencePointFigureX + referencePointFigureY - point.Y, referencePointFigureY + point.X - referencePointFigureX));
+                RotateFigurePointsClockWise(referencePointFigureX, referencePointFigureY);
             }
         }
 
